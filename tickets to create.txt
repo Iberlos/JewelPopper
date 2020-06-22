@@ -1,0 +1,15 @@
+mechanics:
+-loose
+-save/load
+-aim with mouse, move with mouse
+-jewel count and trade offs
+-micro-transactions(!)
+-adds(!)
+polish:
+-ground mesh
+-background image
+-better models
+-sounds
+-menus
+-code review
+-batch rendering for grid jewels

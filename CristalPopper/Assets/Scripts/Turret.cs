@@ -28,7 +28,7 @@ public class Turret : MonoBehaviour
         PlayerController.m_instance.m_turret = this;
         gohstJewel = Instantiate(gohstJewel);
         m_lineRenderer = GetComponent<LineRenderer>();
-        Reload();
+        Reload(GameManager.instance.GetJewel);
     }
 
     public void Move(float a_moveInput)
@@ -114,13 +114,13 @@ public class Turret : MonoBehaviour
         {
             string colorKey = m_nextSphereColorKey;
 
-            bool coodFound = false;
+            bool coordFound = false;
             List<Vector3> positions = new List<Vector3>();
             positions.Add(muzzle.transform.position);
             Vector3 rayDir = muzzle.transform.forward;
             Vector3 rayStart = muzzle.transform.position;
 
-            while (!coodFound)
+            while (!coordFound)
             {
                 RaycastHit outHit = new RaycastHit();
                 if (Physics.SphereCast(rayStart, 0.1f, rayDir, out outHit, 100.0f, LayerMask.GetMask("ClickableCube")))
@@ -149,7 +149,7 @@ public class Turret : MonoBehaviour
                         Sphere sphere = Instantiate(spherePrefab, muzzle.transform.position, muzzle.transform.rotation, null).GetComponent<Sphere>();
                         //Call initialize on Sphere passing in the coord, the endPoint, the collor, the sphereSpeed, the cubeGrid reference and the turret reference
                         sphere.Initialize(positions.ToArray(), destinationCoord, colorKey, sphereSpeed, cubeGrid, this);
-                        coodFound = true;
+                        coordFound = true;
                     }
                     if (outHit.collider.gameObject.tag == "Bouncer")
                     {
@@ -164,7 +164,7 @@ public class Turret : MonoBehaviour
                         Sphere sphere = Instantiate(spherePrefab, muzzle.transform.position, muzzle.transform.rotation, null).GetComponent<Sphere>();
                         //Call initialize on Sphere passing in the coord, the endPoint, the collor, the sphereSpeed, the cubeGrid reference and the turret reference
                         sphere.Initialize(positions.ToArray(), destinationCoord, colorKey, sphereSpeed, cubeGrid, this);
-                        coodFound = true;
+                        coordFound = true;
                     }
                 }
                 else
@@ -172,7 +172,7 @@ public class Turret : MonoBehaviour
                     break;
                 }
             }
-            if(coodFound)
+            if(coordFound)
             {
                 gohstJewel.gameObject.SetActive(false);
                 m_nextSphereColorKey = "";
@@ -181,20 +181,38 @@ public class Turret : MonoBehaviour
         }
     }
 
-    public void Reload()
+    public void Reload(int colorKey)
     {
+        if (colorKey == -1)
+            return;
         gohstJewel.gameObject.SetActive(true);
         string[] keys = new string[4];
         keys[0] = "Red";
         keys[1] = "Green";
         keys[2] = "Blue";
         keys[3] = "Magenta";
-        m_nextSphereColorKey = keys[Random.Range(0, keys.Length)];
+        m_nextSphereColorKey = keys[colorKey];
         jewel.GetComponent<Renderer>().material.color = cubeGrid.GetSphereColorByKey(m_nextSphereColorKey);
         Color gohstColor = cubeGrid.GetSphereColorByKey(m_nextSphereColorKey);
         gohstColor.a = 0.5f;
         gohstJewel.GetComponent<Renderer>().material.color = gohstColor;
         m_lineRenderer.startColor = m_lineRenderer.endColor = gohstColor;
+    }
+
+    public int Unload()
+    {
+        int colorIndex = 0;
+        if (m_nextSphereColorKey == "Red")
+            colorIndex = 0;
+        if (m_nextSphereColorKey == "Green")
+            colorIndex = 1;
+        if (m_nextSphereColorKey == "Blue")
+            colorIndex = 2;
+        if (m_nextSphereColorKey == "Magenta")
+            colorIndex = 3;
+        m_nextSphereColorKey = "";
+        jewel.GetComponent<Renderer>().material.color = cubeGrid.GetSphereColorByKey(m_nextSphereColorKey);
+        return colorIndex;
     }
 
     public void SetMoveLimits(Vector3 a_minPos, Vector3 a_maxPos)

@@ -33,7 +33,7 @@ public class Sphere : MonoBehaviour
             else
             {
                 m_cubeGrid.ActivateCubeAt(m_colorKey, m_destinationCoord);
-                m_turret.Reload();
+                m_turret.Reload(GameManager.instance.GetJewel);
                 Destroy(gameObject);
             }
         }

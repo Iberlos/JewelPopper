@@ -19,6 +19,7 @@ public class CubeGrid : MonoBehaviour
     private List<RootRail> roots = default;
     private GameObject[] bouncers;
     private const int GX = 15, GY = 10;
+    private List<ClickableCube> cubes = default;
 
     void Start()
     {
@@ -62,7 +63,10 @@ public class CubeGrid : MonoBehaviour
 
         //instantiate the turret and give it its min and max pos an the cube grid
         if (turret == null)
+        {
             turret = Instantiate(turretPrefab).GetComponent<Turret>();
+            GameManager.instance.Turret = turret;
+        }
         turret.transform.position = new Vector3(0.0f, GridDimY + 2.5f, 0.0f);
         turret.cubeGrid = this;
         turret.SetMoveLimits(new Vector3(2.0f, turret.transform.position.y, 0.0f), new Vector3(GridDimX - 3.0f, turret.transform.position.y, 0.0f));
@@ -206,13 +210,27 @@ public class CubeGrid : MonoBehaviour
     //Creates the cubes in the right position and puts them in the grid    
     private void GenerateCubes()
     {
+        int cubeListIndex = 0;
+        if(cubes == null)
+        {
+            cubes = new List<ClickableCube>();
+        }
         for (int x = 0; x < GridDimX; ++x)
         {
             for (int y = 0; y < GridDimY; ++y)
             {
                 Vector3 offset = new Vector3(x * GridSpacing, y * GridSpacing, 0.0f);
 
-                GameObject cubeObj = (GameObject)GameObject.Instantiate(CubePrefab);
+                GameObject cubeObj;
+                if (cubeListIndex >= cubes.Count)
+                {
+                    cubeObj = (GameObject)GameObject.Instantiate(CubePrefab);
+                    cubes.Add(cubeObj.GetComponent<ClickableCube>());
+                }
+                else
+                {
+                    cubeObj = cubes[cubeListIndex].gameObject;
+                }
 
                 cubeObj.transform.position = offset + transform.position;
 
@@ -224,6 +242,7 @@ public class CubeGrid : MonoBehaviour
                 m_Grid[x, y].Activated = false;
 
                 DebugUtils.Assert(m_Grid[x, y] != null, "Could not find clickableCube component.");
+                cubeListIndex++;
             }
         }
         string[] keys = new string[4];

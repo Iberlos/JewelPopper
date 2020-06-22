@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
@@ -28,7 +29,8 @@ public class PlayerController : MonoBehaviour
         {
             m_moveInput = Input.GetAxis("Horizontal");
             m_rotateInput = Input.GetAxis("Rotate") != 0 ? Input.GetAxis("Rotate") : Input.GetAxis("Mouse X");
-            m_fireInput = Input.GetMouseButtonDown(0) || Input.GetKeyDown("space");
+            if (!EventSystem.current.IsPointerOverGameObject())
+                m_fireInput = Input.GetMouseButtonDown(0) || Input.GetKeyDown("space");
         }
 
         m_turret.Move(m_moveInput);
