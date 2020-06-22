@@ -2,7 +2,7 @@ mechanics:
 -loose
 -save/load
 -aim with mouse, move with mouse
--jewel count and trade offs
+-jewel count and trade offs V
 -micro-transactions(!)
 -adds(!)
 polish:

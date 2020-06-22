@@ -22,7 +22,29 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Text magentaJewelDisplay = default;
 
+    [SerializeField]
+    private Text levelText = default;
+    [SerializeField]
+    private Text costText = default;
+
     public Turret Turret { get;  set; }
+    public int Level
+    {
+        get
+        {
+            return level;
+        }
+        set
+        {
+            level = value;
+            Cost = level * level + 3;
+            levelText.text = "Level: " + level;
+            costText.text = "Operational Cost : " + Cost;
+        }
+    }
+    public int Cost { get; private set; }
+
+    private int level;
     public int GetJewel
     {
         get
@@ -31,11 +53,11 @@ public class GameManager : MonoBehaviour
             int returnValue = -1;
             for(int i = 0; i<4; i++)
             {
-                if (jewelCounters[index] <= 0)
+                if (jewelCounters[index] < Cost)
                     index = (index + 1) % 4;
                 else
                 {
-                    jewelCounters[index]--;
+                    jewelCounters[index] -= Cost;
                     returnValue = index;
                     break;
                 }
@@ -68,11 +90,11 @@ public class GameManager : MonoBehaviour
 
     public void SelectShot(int colorIndex)
     {
-        if(colorIndex < 3 && colorIndex > -1)
+        if(colorIndex < 4 && colorIndex > -1)
         {
             bool canSelect = true;
             for (int i = 0; i < jewelCounters.Length; i++)
-                if (jewelCounters[i] < 1 || (i == colorIndex && jewelCounters[i] <= 1))
+                if (jewelCounters[i] < Cost || (i == colorIndex && jewelCounters[i] <= Cost))
                 {
                     canSelect = false;
                     break;
@@ -82,7 +104,7 @@ public class GameManager : MonoBehaviour
             {
                 jewelCounters[Turret.Unload()]++;
                 for (int i = 0; i < jewelCounters.Length; i++)
-                    jewelCounters[i]--;
+                    jewelCounters[i] -= Cost;
                 jewelCounters[colorIndex]--;
                 Turret.Reload(colorIndex);
             }
@@ -101,5 +123,6 @@ public class GameManager : MonoBehaviour
     public void AddJewels(int colorIndex, int amount)
     {
         jewelCounters[colorIndex] += amount;
+        RefreshJewelDisplays();
     }
 }

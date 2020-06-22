@@ -11,10 +11,9 @@ public class CubeGrid : MonoBehaviour
     public GameObject bouncerRailPrefab;
     public GameObject rootRailPrefab;
     public Camera gameCamera;
-
     public bool CalculatedCluster;
 
-    private int m_level = 0;
+
     private Turret turret;
     private List<RootRail> roots = default;
     private GameObject[] bouncers;
@@ -40,8 +39,9 @@ public class CubeGrid : MonoBehaviour
     private void PrepareForNextLevel()
     {
         //increse the level
-        GridDimX += m_level;
-        GridDimY += m_level;
+        int level = GameManager.instance.Level;
+        GridDimX += level;
+        GridDimY += level;
 
         if (m_Grid != null)
         {
@@ -88,7 +88,7 @@ public class CubeGrid : MonoBehaviour
         RecalcuateClusters();
         CalculatedCluster = false;
 
-        m_level++;
+        GameManager.instance.Level++;
     }
 
     public void RecalcuateClusters()
@@ -344,8 +344,8 @@ public class CubeGrid : MonoBehaviour
         {
             MergeClusters(clustersAdded);
         }
-        BreakClusters();
         CheckRooted();
+        RemoveBrokenClusters();
         if (m_CubeClusters.Count == 0)
         {
             Debug.Log("You win!");
@@ -384,20 +384,6 @@ public class CubeGrid : MonoBehaviour
         }
     }
 
-    void BreakClusters()
-    {
-        List<CubeCluster> brokenClusters = new List<CubeCluster>();
-        foreach (CubeCluster cluster in m_CubeClusters)
-        {
-            if (cluster.broken) brokenClusters.Add(cluster);
-        }
-        foreach(CubeCluster cluster in brokenClusters)
-        {
-            cluster.Break();
-            m_CubeClusters.Remove(cluster);
-        }
-    }
-
     public void RootAt(Vector2Int a_coord, Vector2Int a_direction)
     {
         IntVector2 rootCoord = new IntVector2(a_coord.x+a_direction.x, a_coord.y+a_direction.y);
@@ -421,14 +407,43 @@ public class CubeGrid : MonoBehaviour
                 m_Grid[i, 0].Root();
             }
         }
-        List<CubeCluster> clearedClusters = new List<CubeCluster>();
         foreach (CubeCluster cluster in m_CubeClusters)
         {
             cluster.CheckRooted();
-            if (cluster.m_Cubes.Count == 0) clearedClusters.Add(cluster);
         }
-        foreach(CubeCluster cluster in clearedClusters)
+    }
+
+    void RemoveBrokenClusters()
+    {
+        List<CubeCluster> brokenClusters = new List<CubeCluster>();
+        foreach (CubeCluster cluster in m_CubeClusters)
         {
+            if (cluster.broken) brokenClusters.Add(cluster);
+        }
+        foreach (CubeCluster cluster in brokenClusters)
+        {
+            int colorKey = -1;
+            if(cluster.m_clusterColorKey == "Red")
+            {
+                colorKey = 0;
+            }
+            if (cluster.m_clusterColorKey == "Green")
+            {
+                colorKey = 1;
+            }
+            if (cluster.m_clusterColorKey == "Blue")
+            {
+                colorKey = 2;
+            }
+            if (cluster.m_clusterColorKey == "Magenta")
+            {
+                colorKey = 3;
+            }
+
+            GameManager.instance.AddJewels(colorKey, cluster.m_Cubes.Count + (brokenClusters.Count - 1)); //for every extra cluster broken add one jewel to each broken cluster coller as a reward
+        }
+        foreach (CubeCluster cluster in brokenClusters)
+        { 
             m_CubeClusters.Remove(cluster);
         }
     }

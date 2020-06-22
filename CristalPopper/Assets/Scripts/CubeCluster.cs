@@ -39,7 +39,7 @@ public class CubeCluster
             m_maxCoords.y = Math.Max(m_maxCoords.y, cube.coord.y);
             if (removeClusters && m_Cubes.Count >= 3)
             {
-                broken = true;
+                Break();
             }
             return true;
         }
@@ -83,7 +83,7 @@ public class CubeCluster
 
     public void Break()
     {
-        //probably count how many and add points with a multiplier to a manager later.
+        broken = true;
         foreach(ClickableCube cube in m_Cubes)
         {
             cube.Activated = false;
@@ -94,11 +94,7 @@ public class CubeCluster
     {
         if(!m_Cubes[0].rooted)
         {
-            foreach(ClickableCube cube in m_Cubes)
-            {
-                cube.Activated = false;
-            }
-            m_Cubes.Clear();
+            Break();
         }
     }
 
