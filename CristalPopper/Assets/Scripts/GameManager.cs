@@ -112,6 +112,21 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void AddJewels(int colorIndex, int amount)
+    {
+        jewelCounters[colorIndex] += amount;
+        RefreshJewelDisplays();
+    }
+
+    public void TradeJewels(int[] amounts)
+    {
+        for(int i =0; i<4; i++)
+        {
+            jewelCounters[i] += amounts[i];
+        }
+        RefreshJewelDisplays();
+    }
+
     private void RefreshJewelDisplays()
     {
         redJewelDisplay.text = jewelCounters[0].ToString();
@@ -120,9 +135,8 @@ public class GameManager : MonoBehaviour
         magentaJewelDisplay.text = jewelCounters[3].ToString();
     }
 
-    public void AddJewels(int colorIndex, int amount)
+    public static int GetJewelCountAt(int colorIndex)
     {
-        jewelCounters[colorIndex] += amount;
-        RefreshJewelDisplays();
+        return instance.jewelCounters[colorIndex];
     }
 }
