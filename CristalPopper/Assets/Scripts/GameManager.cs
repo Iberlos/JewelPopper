@@ -102,7 +102,7 @@ public class GameManager : MonoBehaviour
 
             if (canSelect) //if each jewel counter is at least 1 and the selected one is at least 2 the shot can be selected
             {
-                jewelCounters[Turret.Unload()]++;
+                jewelCounters[Turret.Unload()] += Cost;
                 for (int i = 0; i < jewelCounters.Length; i++)
                     jewelCounters[i] -= Cost;
                 jewelCounters[colorIndex]--;
@@ -138,5 +138,18 @@ public class GameManager : MonoBehaviour
     public static int GetJewelCountAt(int colorIndex)
     {
         return instance.jewelCounters[colorIndex];
+    }
+
+    private void Reset()
+    {
+        jewelCounters[0] = startingRedJewels;
+        jewelCounters[1] = startingGreenJewels;
+        jewelCounters[2] = startingBlueJewels;
+        jewelCounters[3] = startingMagentaJewels;
+    }
+
+    public static void Lose()
+    {
+        instance.Reset();
     }
 }

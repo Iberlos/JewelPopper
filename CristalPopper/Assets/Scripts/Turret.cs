@@ -184,7 +184,10 @@ public class Turret : MonoBehaviour
     public void Reload(int colorKey)
     {
         if (colorKey == -1)
+        {
+            cubeGrid.Lose();
             return;
+        }
         gohstJewel.gameObject.SetActive(true);
         string[] keys = new string[4];
         keys[0] = "Red";

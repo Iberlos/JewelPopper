@@ -19,9 +19,12 @@ public class CubeGrid : MonoBehaviour
     private GameObject[] bouncers;
     private const int GX = 15, GY = 10;
     private List<ClickableCube> cubes = default;
-
+    private int gridDimX;
+    private int gridDimY;
     void Start()
     {
+        gridDimX = GridDimX;
+        gridDimY = GridDimY;
         PrepareForNextLevel();
     }
 
@@ -40,8 +43,8 @@ public class CubeGrid : MonoBehaviour
     {
         //increse the level
         int level = GameManager.instance.Level;
-        GridDimX += level;
-        GridDimY += level;
+        gridDimX += level;
+        gridDimY += level;
 
         if (m_Grid != null)
         {
@@ -58,8 +61,8 @@ public class CubeGrid : MonoBehaviour
         }
 
         //setup camera
-        gameCamera.orthographicSize = (GridDimY + 7f)/2f;
-        gameCamera.transform.position = new Vector3(GridDimX * 0.5f, gameCamera.orthographicSize - 2f, -10f);
+        gameCamera.orthographicSize = (gridDimY + 7f)/2f;
+        gameCamera.transform.position = new Vector3(gridDimX * 0.5f, gameCamera.orthographicSize - 2f, -10f);
 
         //instantiate the turret and give it its min and max pos an the cube grid
         if (turret == null)
@@ -67,17 +70,17 @@ public class CubeGrid : MonoBehaviour
             turret = Instantiate(turretPrefab).GetComponent<Turret>();
             GameManager.instance.Turret = turret;
         }
-        turret.transform.position = new Vector3(0.0f, GridDimY + 2.5f, 0.0f);
+        turret.transform.position = new Vector3(0.0f, gridDimY + 2.5f, 0.0f);
         turret.cubeGrid = this;
-        turret.SetMoveLimits(new Vector3(2.0f, turret.transform.position.y, 0.0f), new Vector3(GridDimX - 3.0f, turret.transform.position.y, 0.0f));
+        turret.SetMoveLimits(new Vector3(2.0f, turret.transform.position.y, 0.0f), new Vector3(gridDimX - 3.0f, turret.transform.position.y, 0.0f));
 
         //Create a 2D array to hold the cubes, then generate the cubes in it
         if (m_Grid == null)
-            m_Grid = new ClickableCube[GridDimX, GridDimY];
+            m_Grid = new ClickableCube[gridDimX, gridDimY];
 
         //Create a grid of visited cells
         if(m_VisitedCells == null)
-            m_VisitedCells = new bool[GridDimX, GridDimY];
+            m_VisitedCells = new bool[gridDimX, gridDimY];
 
         GenerateCubes();
         GenerateRoots();
@@ -89,6 +92,15 @@ public class CubeGrid : MonoBehaviour
         CalculatedCluster = false;
 
         GameManager.instance.Level++;
+    }
+
+    public void Lose()
+    {
+        GameManager.Lose();
+        gridDimX = GridDimX;
+        gridDimY = GridDimY;
+        GameManager.instance.Level = 0;
+        PrepareForNextLevel();
     }
 
     public void RecalcuateClusters()
@@ -170,9 +182,9 @@ public class CubeGrid : MonoBehaviour
     //Sets all of the visited cells back to non-visited
     void ClearVisitedCells()
     {
-        for (int x = 0; x < GridDimX; ++x)
+        for (int x = 0; x < gridDimX; ++x)
         {
-            for (int y = 0; y < GridDimY; ++y)
+            for (int y = 0; y < gridDimY; ++y)
             {
                 m_VisitedCells[x, y] = false;
             }
@@ -187,9 +199,9 @@ public class CubeGrid : MonoBehaviour
     //      this location next time the function is executed.
     bool FindNonVisitedCoord(out IntVector2 nonVisitedCoord)
     {
-        for (int x = 0; x < GridDimX; ++x)
+        for (int x = 0; x < gridDimX; ++x)
         {
-            for (int y = 0; y < GridDimY; ++y)
+            for (int y = 0; y < gridDimY; ++y)
             {
                 if (m_Grid[x, y].Activated && !m_VisitedCells[x, y])
                 {
@@ -215,9 +227,9 @@ public class CubeGrid : MonoBehaviour
         {
             cubes = new List<ClickableCube>();
         }
-        for (int x = 0; x < GridDimX; ++x)
+        for (int x = 0; x < gridDimX; ++x)
         {
-            for (int y = 0; y < GridDimY; ++y)
+            for (int y = 0; y < gridDimY; ++y)
             {
                 Vector3 offset = new Vector3(x * GridSpacing, y * GridSpacing, 0.0f);
 
@@ -251,9 +263,9 @@ public class CubeGrid : MonoBehaviour
         keys[2] = "Blue";
         keys[3] = "Magenta";
         //Choose randomly if the cube should start activated or not
-        for (int x = 0; x < GridDimX; ++x)
+        for (int x = 0; x < gridDimX; ++x)
         {
-            for (int y = 0; y < GridDimY-5; ++y)
+            for (int y = 0; y < gridDimY-5; ++y)
             {
                 m_Grid[x, y].ActivateCube(keys[Random.Range(0, keys.Length)]);
             }
@@ -266,7 +278,7 @@ public class CubeGrid : MonoBehaviour
         if(roots == null)
         {
             roots = new List<RootRail>();
-            for (int x = 0; x < GridDimX; ++x)
+            for (int x = 0; x < gridDimX; ++x)
             {
                 Vector3 offset = new Vector3(x * GridSpacing, -1f * GridSpacing, 0.0f);
                 RootRail root = Instantiate(rootRailPrefab).GetComponent<RootRail>();
@@ -279,7 +291,7 @@ public class CubeGrid : MonoBehaviour
         }
         else
         {
-            for(int x = roots.Count; x < GridDimX; x++)
+            for(int x = roots.Count; x < gridDimX; x++)
             {
                 Vector3 offset = new Vector3(x * GridSpacing, -1f * GridSpacing, 0.0f);
                 RootRail root = Instantiate(rootRailPrefab).GetComponent<RootRail>();
@@ -302,10 +314,10 @@ public class CubeGrid : MonoBehaviour
             bouncers[1] = Instantiate(bouncerRailPrefab);
         }
         //position them on the side of the grids and scale them to be the size of all the rows
-        bouncers[0].transform.position = new Vector3(-GridSpacing, GridDimY * GridSpacing * 0.5f, 0f);
-        bouncers[0].transform.localScale = new Vector3(1f, (GridDimY + 6) * GridSpacing, 1f);
-        bouncers[1].transform.position = new Vector3(GridDimX * GridSpacing, GridDimY * GridSpacing * 0.5f, 0f);
-        bouncers[1].transform.localScale = new Vector3(1f, (GridDimY + 6) * GridSpacing, 1f);
+        bouncers[0].transform.position = new Vector3(-GridSpacing, gridDimY * GridSpacing * 0.5f, 0f);
+        bouncers[0].transform.localScale = new Vector3(1f, (gridDimY + 6) * GridSpacing, 1f);
+        bouncers[1].transform.position = new Vector3(gridDimX * GridSpacing, gridDimY * GridSpacing * 0.5f, 0f);
+        bouncers[1].transform.localScale = new Vector3(1f, (gridDimY + 6) * GridSpacing, 1f);
     }
 
     public void ActivateCubeAt(string a_colorKey, Vector2Int a_coord)
@@ -317,9 +329,10 @@ public class CubeGrid : MonoBehaviour
         }
         else
         {
-            if(a_coord.y >= GridDimY)
+            if(a_coord.y >= gridDimY)
             {
                 Debug.Log("YOU LOSE!");
+                Lose();
             }
         }
     }
@@ -400,7 +413,7 @@ public class CubeGrid : MonoBehaviour
         {
             cube.rooted = false;
         }
-        for(int i = 0; i<GridDimX; i++)
+        for(int i = 0; i<gridDimX; i++)
         {
             if(m_Grid[i, 0].Activated)
             {
