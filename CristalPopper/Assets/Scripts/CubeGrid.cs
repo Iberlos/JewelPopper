@@ -36,6 +36,7 @@ public class CubeGrid : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.O))
         {
+            Lose();
         }
     }
 
@@ -62,7 +63,7 @@ public class CubeGrid : MonoBehaviour
 
         //setup camera
         gameCamera.orthographicSize = (gridDimY + 7f)/2f;
-        gameCamera.transform.position = new Vector3(gridDimX *0.5f + 4f, gameCamera.orthographicSize - 1.5f, -10f);
+        gameCamera.transform.position = new Vector3(gridDimX *0.5f, gameCamera.orthographicSize - 1.5f, -10f);
 
         //instantiate the turret and give it its min and max pos an the cube grid
         if (turret == null)
