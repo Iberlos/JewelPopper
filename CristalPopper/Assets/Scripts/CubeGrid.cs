@@ -62,7 +62,7 @@ public class CubeGrid : MonoBehaviour
 
         //setup camera
         gameCamera.orthographicSize = (gridDimY + 7f)/2f;
-        gameCamera.transform.position = new Vector3(gridDimX * 0.5f, gameCamera.orthographicSize - 2f, -10f);
+        gameCamera.transform.position = new Vector3(gridDimX *0.5f + 4f, gameCamera.orthographicSize - 1.5f, -10f);
 
         //instantiate the turret and give it its min and max pos an the cube grid
         if (turret == null)
@@ -253,7 +253,7 @@ public class CubeGrid : MonoBehaviour
                 m_Grid[x, y].coord = new Vector2Int(x, y);
                 m_Grid[x, y].Activated = false;
 
-                DebugUtils.Assert(m_Grid[x, y] != null, "Could not find clickableCube component.");
+                Debug.Assert(m_Grid[x, y] != null, "Could not find clickableCube component.");
                 cubeListIndex++;
             }
         }
